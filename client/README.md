@@ -67,3 +67,5 @@ export default tseslint.config([
   },
 ])
 ```
+// For transcaton deploy 
+npx hardhat run script/deploy.js --network sepolia
