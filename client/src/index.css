@@ -11,7 +11,9 @@
   margin: 0;
   box-sizing: border-box;
 }
-
+@theme{
+   --mf: "990px",
+}
 body {
   margin: 0;
   font-family: "Open Sans", sans-serif;

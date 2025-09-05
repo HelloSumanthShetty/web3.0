@@ -27,7 +27,7 @@ function addToBlockchain(address payable receiver ,uint amount,string memory mes
 function getAllTransactions() public view returns(TransferStruct[] memory){
     return transactions;
 }
-function addToBlockchain() public view returns(uint256){
+function getTransactionCount() public view returns(uint256){
     return transactionCounter;
 }
 
