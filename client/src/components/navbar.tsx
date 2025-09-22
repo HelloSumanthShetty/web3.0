@@ -1,6 +1,6 @@
 import {HiMenuAlt4} from "react-icons/hi"
 import { AiOutlineClose } from "react-icons/ai"
-import logo from "../../images/logo.png"
+import logo from "../../public/icon.svg"
 import { useState } from "react";
 type NavItemProps = {
   title: string;
@@ -17,11 +17,12 @@ const NavItem= ({title,classprops}:NavItemProps)=>{
 const Navbar = () => {
   const [togglemenu, settogglemenu] = useState<Boolean>(false)
   return (
-    <nav className="w-full flex md:justify-center justify-between items-center p-4" >
- <div className="md:flex-[0.5] flex-initial justify-center items-center">
- <img src={logo} alt="logo" className="w-32 cursor-pointer" />
+    <nav className="w-full flex  justify-between items-center p-4" >
+ <div className="md:flex  top-4 ml-10 gap-4 cursor-pointer">
+ <img src={logo} alt="logo" className="w-32 " />
+  <h1 className="text-white flex justify-center items-center text-2xl font-bold ">ETHERYO</h1>
  </div>
- <ul className="text-white md:flex hidden list-none flex-row  items-center flex-initial ">
+ <ul className="text-white md:flex hidden text-xl list-none flex-row  items-center ml-auto  flex-initial ">
  {["Market","Exchange","Tutorial","Wallets"].map((items,index) => (
   <NavItem key={items+index } title={items}/>   ) )}
   <li className="bg-blue-400 py-2 px-6 mx-4  rounded-lg  cursor-pointer  hover:bg-[#2546bd]">

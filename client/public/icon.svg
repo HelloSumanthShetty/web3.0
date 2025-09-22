@@ -1,0 +1,38 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <filter id="outerGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <linearGradient id="etheryoGradient">
+      <stop offset="0%" stop-color="#A020F0" />
+      <stop offset="100%" stop-color="#6A0DAD" />
+    </linearGradient>
+  </defs>
+  <circle 
+    cx="100" 
+    cy="100" 
+    r="90" 
+    fill="none" 
+    stroke="white" 
+    stroke-width="5" 
+    filter="url(#outerGlow)" 
+  />
+
+  <g transform="translate(100 100) scale(0.85) translate(-100 -90)">
+    <path d="M 100 20 L 130 80 L 100 140 L 70 80 Z" fill="url(#etheryoGradient)"/>
+    
+    <path d="M 100 30 L 125 75 L 100 120 L 75 75 Z" fill="none" stroke="white" stroke-width="1.5" stroke-opacity="0.8"/>
+    
+    <path d="M 100 30 L 125 75 L 75 75 Z" fill="white" fill-opacity="0.25" />
+    <path d="M 100 120 L 125 75 L 75 75 Z" fill="black" fill-opacity="0.25" />
+    
+    <ellipse cx="100" cy="145" rx="35" ry="10" fill="white" fill-opacity="0.1" />
+  </g>
+  
+</svg>

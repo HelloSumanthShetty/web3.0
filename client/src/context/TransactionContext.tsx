@@ -14,22 +14,22 @@ declare global {
 export const TransactionContext = React.createContext({
     CurrentAccount: "",
     sendTransaction: () => { },
-    // Transactions:[]
     connectWallet: async () => { },
+    isLoading: true,
     FormData: {
         addressTo: "",
         amount: "",
         keyword: "",
         message: ""
     },
-    setFormData: {},
+    checkifWalletIsConnected: () => { },
     handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => { }
 });
 
 
 const getEthereumContract = () => {
-    const provider = new ethers.providers.Web3Provider(ethereum);           //read or fetches balances form metamask 
-    const signer = provider.getSigner();                                      //get the signer that is need to do mutating data
+    const provider = new ethers.providers.Web3Provider(ethereum);           
+    const signer = provider.getSigner();
     const TransactionContract = new ethers.Contract(contractAddress, constractABI, signer)
     return TransactionContract
 
@@ -53,11 +53,9 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             if (!ethereum) {
                 alert("Please Install Metamask!!")
             }
-            //window.ethereum 
             const account = await ethereum.request({ method: "eth_accounts" });
             if (account.length > 0) {
                 setCurrentAccount(account[0])
-
             }
             else {
                 console.log("No account Found")
@@ -127,33 +125,34 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     };
 
     const sendTransaction = async () => {
-  try {
-    if (!ethereum) return alert("Please Install MetaMask");
+        try {
+            if (!ethereum) return alert("Please Install MetaMask");
 
-    const { addressTo, amount, keyword, message } = FormData;
-    const hexAmount = ethers.utils.parseEther(amount);
-    const TransactionContract = getEthereumContract();
+            const { addressTo, amount, keyword, message } = FormData;
+            const hexAmount = ethers.utils.parseEther(amount);
+            const TransactionContract = getEthereumContract();
 
-    const tx = await TransactionContract.addToBlockchain(
-      addressTo,
-      message,
-      keyword,
-      { value: hexAmount }
-    );
+            const tx = await TransactionContract.addToBlockchain(
+                addressTo,
+                message,
+                keyword,
+                { value: hexAmount }
+            );
 
-    setisLoading(true);
-    console.log(`Loading - ${tx.hash}`);
-    await tx.wait();
-    setisLoading(false);
-    console.log(`Success - ${tx.hash}`);
-
-    const transactionCount = await TransactionContract.getTransactionCount();
-    settransactionCount(transactionCount.toNumber());
-  } catch (error) {
-    console.error(error);
-    throw new Error("No ethereum object.");
-  }
-};
+            setisLoading(true);
+            console.log(`Loading - ${tx.hash}`);
+            console.log(isLoading)
+            await tx.wait();
+            setisLoading(false);
+            console.log(`Success - ${tx.hash}`);
+            setFormData({ addressTo: "", amount: "", keyword: "", message: "" });
+            const transactionCount = await TransactionContract.getTransactionCount();
+            settransactionCount(transactionCount.toNumber());
+        } catch (error) {
+            console.error(error);
+            throw new Error("No ethereum object.");
+        }
+    };
 
 
     // const sendTransaction = async () => {
@@ -166,7 +165,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     //         const hexamount = ethers.utils.parseEther(amount)
     //         const TransactionContract = getEthereumContract()
     //         console.log(TransactionContract)
-            
+
     //         await ethereum.request({
     //             method: "eth_sendTransaction",
     //             params: [
@@ -196,7 +195,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
         checkifWalletIsConnected()
         // if (window.ethereum) {
-            
+
         //     const handleChainChanged = (chainIdHex :any) => {
         //         console.log("Network has changed to:", chainIdHex);
         //         window.location.reload();
@@ -218,7 +217,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     }, [CurrentAccount]);
 
     return (
-        <TransactionContext.Provider value={{ connectWallet, CurrentAccount, FormData, setFormData, handlechange, sendTransaction }}>
+        <TransactionContext.Provider value={{ connectWallet, checkifWalletIsConnected, isLoading, CurrentAccount, FormData, handlechange, sendTransaction }}>
             {children}
         </TransactionContext.Provider>
     );

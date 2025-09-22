@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
-import { AiFillPlayCircle } from "react-icons/ai";
+import React, { useContext,useState } from "react";
+import { MdOutlineRefresh } from "react-icons/md";
 import { BsInfoCircle } from "react-icons/bs";
 import { SiEthereum } from "react-icons/si";
 import { TransactionContext } from "../context/TransactionContext";
+import Loader from "./Loader";
 
 type InputProps = {
   placeholder: string;
@@ -27,7 +28,8 @@ const Input = ({ placeholder, name, type, value, handlechange }: InputProps) => 
 );
 
 const Welcome = () => {
-  const { connectWallet, CurrentAccount, FormData, handlechange, sendTransaction } = useContext(TransactionContext);
+      const [isaccountChanged, setisaccountChanged] = useState(false)
+  const { connectWallet, isLoading, CurrentAccount, FormData, handlechange, checkifWalletIsConnected, sendTransaction } = useContext(TransactionContext);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,10 +69,17 @@ const Welcome = () => {
       <div className="flex flex-col flex-1 items-center justify-start w-full md:mt-0 mt-10">
         <div className="p-3 flex justify-end items-start flex-col rounded-xl h-40 sm:w-72 w-full my-5 eth-card white-glassmorphism">
           <div className="flex justify-between flex-col w-full h-full">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start gap-3 ">
               <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
                 <SiEthereum fontSize={21} color="#fff" />
               </div>
+              <MdOutlineRefresh className={`flex ml-auto text-neutral-900 ${isaccountChanged ? 'animate-spin' : ''}`} onClick={() => { 
+                setisaccountChanged(true)
+                checkifWalletIsConnected();
+                setTimeout(() => {
+                  setisaccountChanged(false)
+                }, 1000);
+              }} fontSize={19} />
               <BsInfoCircle fontSize={17} color="#fff" />
             </div>
             <div>
@@ -89,12 +98,17 @@ const Welcome = () => {
 
             <div className="h-[1px] w-full bg-gray-400 my-2" />
 
-            <button
-              type="submit"
-              className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
-            >
-              Send now
-            </button>
+           {isLoading
+              ? <Loader />
+              : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
+                >
+                  Send now
+                </button>
+              )}
           </form>
         </div>
       </div>
