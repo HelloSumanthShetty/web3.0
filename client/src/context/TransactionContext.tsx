@@ -1,4 +1,3 @@
-const { ethereum } = window
 import React, { useState, useEffect, } from 'react'
 import { ethers, } from "ethers"
 
@@ -10,21 +9,29 @@ declare global {
     }
 }
 
+const { ethereum } = window
+
+type FormDataType = {
+  addressTo: string;
+  amount: string;
+  keyword: string;
+  message: string;
+};
+
+// 2. Define the type for the entire context
+type TransactionContextType = {
+  CurrentAccount: string;
+  sendTransaction: () => void;
+  connectWallet: () => Promise<void>;
+  isLoading: boolean;
+  FormData: FormDataType;
+  checkifWalletIsConnected: () => void;
+  handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
+};
+
+
 //creates an global context 
-export const TransactionContext = React.createContext({
-    CurrentAccount: "",
-    sendTransaction: () => { },
-    connectWallet: async () => { },
-    isLoading: true,
-    FormData: {
-        addressTo: "",
-        amount: "",
-        keyword: "",
-        message: ""
-    },
-    checkifWalletIsConnected: () => { },
-    handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => { }
-});
+export const TransactionContext = React.createContext<TransactionContextType>({} as TransactionContextType );
 
 
 const getEthereumContract = () => {
@@ -84,8 +91,8 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
             const formattedBalance = ethers.utils.formatEther(balanceWei);
             setBalance(formattedBalance);
-            console.log("New balance is:", formattedBalance);
-
+            return formattedBalance
+       
         } catch (error) {
             console.error("Failed to get balance:", error);
         }
@@ -145,8 +152,11 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             await tx.wait();
             setisLoading(false);
             console.log(`Success - ${tx.hash}`);
-            setFormData({ addressTo: "", amount: "", keyword: "", message: "" });
-            const transactionCount = await TransactionContract.getTransactionCount();
+           const formattedBalance= await getBalance()
+           
+           alert(`${CurrentAccount} Money has been Updated to ${formattedBalance} `);
+           setFormData({ addressTo: "", amount: "", keyword: "", message: "" });
+           const transactionCount = await TransactionContract.getTransactionCount();
             settransactionCount(transactionCount.toNumber());
         } catch (error) {
             console.error(error);
@@ -215,9 +225,9 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         getBalance();
         setupChainListener();
     }, [CurrentAccount]);
-
+   const value={ connectWallet, checkifWalletIsConnected, isLoading, CurrentAccount, FormData, handlechange, sendTransaction }        
     return (
-        <TransactionContext.Provider value={{ connectWallet, checkifWalletIsConnected, isLoading, CurrentAccount, FormData, handlechange, sendTransaction }}>
+        <TransactionContext.Provider value={value}>
             {children}
         </TransactionContext.Provider>
     );

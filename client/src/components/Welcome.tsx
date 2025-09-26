@@ -29,6 +29,7 @@ const Input = ({ placeholder, name, type, value, handlechange }: InputProps) => 
 
 const Welcome = () => {
       const [isaccountChanged, setisaccountChanged] = useState(false)
+      
   const { connectWallet, isLoading, CurrentAccount, FormData, handlechange, checkifWalletIsConnected, sendTransaction } = useContext(TransactionContext);
 
   const handleSubmit = (e: React.FormEvent) => {
