@@ -58,9 +58,9 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     const checkifWalletIsConnected = async () => {
         try {
             if (!ethereum) {
-                alert("Please Install Metamask!!")
+              return alert("Please Install Metamask!!")
             }
-            const account = await ethereum.request({ method: "eth_accounts" });
+            const account = await ethereum?.request({ method: "eth_accounts" });
             if (account.length > 0) {
                 setCurrentAccount(account[0])
             }
@@ -118,7 +118,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     }
 
     const setupChainListener = () => {
-        const chainIdHex = ethereum.chainId;
+        const chainIdHex = ethereum?.chainId;
         console.log("Current Chain ID (Hex):", chainIdHex);
         if (ethereum) {
             ethereum.on('chainChanged', () => {
@@ -136,9 +136,12 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             if (!ethereum) return alert("Please Install MetaMask");
 
             const { addressTo, amount, keyword, message } = FormData;
+            if (!addressTo || !amount || !keyword || !message) {
+               alert("Please fill in all required fields!");
+               return;
+              }
             const hexAmount = ethers.utils.parseEther(amount);
             const TransactionContract = getEthereumContract();
-
             const tx = await TransactionContract.addToBlockchain(
                 addressTo,
                 message,

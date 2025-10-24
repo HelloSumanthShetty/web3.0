@@ -18,9 +18,9 @@ const Navbar = () => {
   const [togglemenu, settogglemenu] = useState<Boolean>(false)
   return (
     <nav className="w-full flex  justify-between items-center p-4" >
- <div className="md:flex  top-4 ml-10 gap-4 cursor-pointer">
- <img src={logo} alt="logo" className="w-32 " />
-  <h1 className="text-white flex justify-center items-center text-2xl font-bold ">ETHERYO</h1>
+ <div className="flex items-center max-sm:-justify-end gap-4 cursor-pointer">
+ <img src={logo} alt="logo" className="w-2/12" />
+  <h1 className="text-white   text-2xl font-bold ">ETHERYO</h1>
  </div>
  <ul className="text-white md:flex hidden text-xl list-none flex-row  items-center ml-auto  flex-initial ">
  {["Market","Exchange","Tutorial","Wallets"].map((items,index) => (

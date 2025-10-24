@@ -10,8 +10,8 @@
     </filter>
 
     <linearGradient id="etheryoGradient">
-      <stop offset="0%" stop-color="#A020F0" />
-      <stop offset="100%" stop-color="#6A0DAD" />
+      <stop offset="0%" stop-color="#e4e4e4ff" />
+      <stop offset="100%" stop-color="#000000ff" />
     </linearGradient>
   </defs>
   <circle 
