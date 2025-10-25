@@ -4,6 +4,7 @@ import { BsInfoCircle } from "react-icons/bs";
 import { SiEthereum } from "react-icons/si";
 import { TransactionContext } from "../context/TransactionContext";
 import Loader from "./Loader";
+import { useSpring, animated } from "@react-spring/web";
 
 type InputProps = {
   placeholder: string;
@@ -29,13 +30,25 @@ const Input = ({ placeholder, name, type, value, handlechange }: InputProps) => 
 
 const Welcome = () => {
       const [isaccountChanged, setisaccountChanged] = useState(false)
-      
+      const [flipped, setFlipped] = useState(false);
   const { connectWallet, isLoading, CurrentAccount, FormData, handlechange, checkifWalletIsConnected, sendTransaction } = useContext(TransactionContext);
+
+  const [props, set] = useSpring(() => ({
+    rotateX: 0,
+    rotateY: 0,
+    scale: 1,
+    config: { mass: 5, tension: 350, friction: 40 },
+  }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendTransaction();
   };
+ const { transform, opacity } = useSpring({
+    opacity: flipped ? 1 : 0,
+    transform: `perspective(600px) rotateY(${flipped ? 180 : 0}deg)`,
+    config: { mass: 5, tension: 500, friction: 80 },
+  });
 
   return (
     <div className="flex max-md:flex-col w-full justify-center items-center">
@@ -68,7 +81,41 @@ const Welcome = () => {
       </div>
 
       <div className="flex flex-col  flex-1 items-center justify-start w-full md:mt-0 mt-10">
-        <div className="p-3 flex justify-end  max-md:w-7/12 max-sm:w-11/12 items-start flex-col h-45 md:h-50  lg:w-80 w-full my-5  bg-gradient-to-br from-[#1a1a1d] via-[#3c3c43] to-[#0f0e13] rounded-2xl  shadow-2xl">
+
+         <div
+      onClick={() => setFlipped(state => !state)}
+       className="relative cursor-pointer w-[300px] h-[220px] max-w-full sm:w-[280px] md:w-[300px]"
+>
+ 
+      <animated.div
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          opacity: opacity.to(o => 1 - o),
+          transform,
+          background: "gradient-bg-welcome",
+          borderRadius: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <animated.div
+        className="p-3 flex justify-end    items-start flex-col h-10/12  w-full max-[200px]:w-9/12  bg-gradient-to-br from-[#1a1a1d] via-[#3c3c43] to-[#0f0e13] rounded-2xl  shadow-2xl  cursor-pointer"
+        style={{
+          transform: props.rotateX
+            .to((x) => `perspective(600px) rotateX(${x}deg) rotateY(${props.rotateY.get()}deg) scale(${props.scale.get()})`)
+        }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = (e.clientY - rect.top - rect.height / 2) / 10;
+          const y = (e.clientX - rect.left - rect.width / 2) / 10;
+          set.start({ rotateX: -x, rotateY: y, scale: 1.05 });
+        }}
+        onMouseLeave={() => set.start({ rotateX: 0, rotateY: 0, scale: 1 })}
+      >
+       
           <div className="flex justify-between flex-col w-full h-full">
             <div className="flex justify-between  items-start gap-3 ">
               <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
@@ -86,10 +133,69 @@ const Welcome = () => {
             <div>
               <p className="bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-600 bg-clip-text text-transparent font-light text-sm truncate tracking-wide">{CurrentAccount}</p>
               <p className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white font-semibold text-lg mt-1 ">Ethereum</p>
-            </div>
+            
           </div>
         </div>
+      </animated.div>
 
+      </animated.div>
+
+      <animated.div
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          opacity,
+          transform,
+          rotateY: "180deg",
+          background: "gradient-bg-welcome",
+          borderRadius: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+       <animated.div
+        className="p-3 flex justify-end    items-start flex-col h-10/12  w-full max-[200px]:w-9/12  bg-gradient-to-br from-[#1a1a1d] via-[#3c3c43] to-[#0f0e13] rounded-2xl  shadow-2xl  cursor-pointer"
+        style={{
+          transform: props.rotateX
+            .to((x) => `perspective(600px) rotateX(${x}deg) rotateY(${props.rotateY.get()}deg) scale(${props.scale.get()})`)
+        }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = (e.clientY - rect.top - rect.height / 2) / 10;
+          const y = (e.clientX - rect.left - rect.width / 2) / 10;
+          set.start({ rotateX: -x, rotateY: y, scale: 1.05 });
+        }}
+        onMouseLeave={() => set.start({ rotateX: 0, rotateY: 0, scale: 1 })}
+      >
+       
+          <div className="flex justify-between flex-col w-full h-full">
+            <div className="flex justify-between  items-start gap-3 ">
+              <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
+                <SiEthereum fontSize={21} color="#d0d0d0" />
+              </div>
+              <MdOutlineRefresh className={`flex ml-auto text-neutral-900 ${isaccountChanged ? 'animate-spin' : ''}`} onClick={() => { 
+                setisaccountChanged(true)
+                checkifWalletIsConnected();
+                setTimeout(() => {
+                  setisaccountChanged(false)
+                }, 1000);
+              }} fontSize={19} />
+              <BsInfoCircle fontSize={17} color="#bfbfbf" />
+            </div>
+            <div>
+              <p className="bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-600 bg-clip-text text-transparent font-light text-sm truncate tracking-wide">{CurrentAccount}</p>
+              <p className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white font-semibold text-lg mt-1 ">Ethereum</p>
+            
+          </div>
+        </div>
+      </animated.div>
+
+      </animated.div>
+    </div>
+ 
+      
         <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
           <form className="w-full" onSubmit={handleSubmit}>
             <Input placeholder="Address To" name="addressTo" type="text" value={FormData.addressTo} handlechange={handlechange} />
