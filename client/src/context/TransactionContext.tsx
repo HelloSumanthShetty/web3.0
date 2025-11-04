@@ -26,6 +26,7 @@ type TransactionContextType = {
   isLoading: boolean;
   FormData: FormDataType;
   checkifWalletIsConnected: () => void;
+  transactions: Array<any>;
   handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
 };
 
@@ -40,8 +41,6 @@ const getEthereumContract = () => {
     const TransactionContract = new ethers.Contract(contractAddress, constractABI, signer)
     return TransactionContract
 
-
-
 }
 
 export const TransactionProvider = ({ children }: { children: React.ReactNode }) => {
@@ -51,6 +50,8 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     const [FormData, setFormData] = useState({ addressTo: "", amount: "", keyword: "", message: "" })
     const [transactionCount, settransactionCount] = useState(localStorage.getItem("transactionCount"))
     const [isLoading, setisLoading] = useState(false)
+    const [transactions, setTransactions] = useState([]);
+
     const handlechange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         setFormData((prev) => ({ ...prev, [name]: e.target.value }));
     };
@@ -117,6 +118,33 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
     }
 
+
+     const getAllTransactions = async () => {
+    try {
+      if (ethereum) {
+        const transactionsContract = getEthereumContract();
+
+        const availableTransactions = await transactionsContract.getAllTransactions();
+
+        const structuredTransactions = availableTransactions.map((transaction: any) => ({
+          addressTo: transaction.receiver,
+          addressFrom: transaction.sender,
+          timestamp: new Date().toISOString().split('T')[0],
+          message: transaction.message,
+          keyword: transaction.keyword,
+          amount: parseInt(transaction.amount._hex) / (10 ** 18)
+        }));
+
+        console.log(structuredTransactions);
+
+        setTransactions(structuredTransactions);
+      } else {
+        console.log("Ethereum is not present");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
     const setupChainListener = () => {
         const chainIdHex = ethereum?.chainId;
         console.log("Current Chain ID (Hex):", chainIdHex);
@@ -207,6 +235,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
 
         checkifWalletIsConnected()
+        getAllTransactions();
         // if (window.ethereum) {
 
         //     const handleChainChanged = (chainIdHex :any) => {
@@ -228,7 +257,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         getBalance();
         setupChainListener();
     }, [CurrentAccount]);
-   const value={ connectWallet, checkifWalletIsConnected, isLoading, CurrentAccount, FormData, handlechange, sendTransaction }        
+   const value={ connectWallet, checkifWalletIsConnected, isLoading, transactions, CurrentAccount, FormData, handlechange, sendTransaction }        
     return (
         <TransactionContext.Provider value={value}>
             {children}
