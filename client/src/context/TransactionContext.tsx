@@ -46,9 +46,9 @@ const getEthereumContract = () => {
 export const TransactionProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [CurrentAccount, setCurrentAccount] = useState("")
-    const [Balance, setBalance] = useState("")
+    const [, setBalance] = useState("")
     const [FormData, setFormData] = useState({ addressTo: "", amount: "", keyword: "", message: "" })
-    const [transactionCount, settransactionCount] = useState(localStorage.getItem("transactionCount"))
+    const [, settransactionCount] = useState(localStorage.getItem("transactionCount"))
     const [isLoading, setisLoading] = useState(false)
     const [transactions, setTransactions] = useState([]);
 

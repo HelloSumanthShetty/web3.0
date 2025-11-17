@@ -1,5 +1,5 @@
   import { useEffect, useState } from "react";
-  import { DotLottie } from "@lottiefiles/dotlottie-web";
+  // import { DotLottie } from "@lottiefiles/dotlottie-web";
 
   // const APIKEY = import.meta.env.VITE_GIPHY_API;
 
