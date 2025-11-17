@@ -18,9 +18,9 @@ const TransactionsCard = ({
   addressFrom,
   timestamp,
   message,
-  keyword,
+  // keyword,
   amount,
-  url,
+  // url,
 }: TransactionProps) => {
   
   const canvasRef = useLottie();
