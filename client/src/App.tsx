@@ -1,7 +1,6 @@
-import {Navbar,Footer,Loader,Services,Transactions,Welcome} from "./components"
-type Props = {}
+import {Navbar,Footer,Services,Transactions,Welcome} from "./components"
 
-const App = (props: Props) => {
+const App = () => {
   return (
     <div className="min-h-screen w-full">
       <div className="gradient-bg-welcome max-sm:px-5 px-10">

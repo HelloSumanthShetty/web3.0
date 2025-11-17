@@ -1,9 +1,9 @@
   import { useEffect, useState } from "react";
   import { DotLottie } from "@lottiefiles/dotlottie-web";
 
-  const APIKEY = import.meta.env.VITE_GIPHY_API;
+  // const APIKEY = import.meta.env.VITE_GIPHY_API;
 
-  const canvas = document.querySelector("#dotlottie-canvas") as HTMLCanvasElement | null;
+  // const canvas = document.querySelector("#dotlottie-canvas") as HTMLCanvasElement | null;
 
 
   // if (!canvas) {
