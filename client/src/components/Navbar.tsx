@@ -83,7 +83,7 @@ const Navbar = () => {
 
       <ul className="md:flex hidden text-xl list-none flex-row items-center ml-auto flex-initial gap-4">
       
-        <li>
+        
         <li>
   <button
     onClick={toggleTheme}
@@ -101,13 +101,14 @@ const Navbar = () => {
       <BsMoon className="text-lg text-black" />
     )}
   </button>
-</li>
+
 
         </li>
         <NavItem
           title="Home"
           onClick={() => scrollToSection('home')}
         />
+        
         <NavItem
           title="Services"
           onClick={() => scrollToSection('services')}

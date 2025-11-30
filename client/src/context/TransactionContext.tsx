@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ethers, } from "ethers"
-import toast from 'react-hot-toast'     
-import { FaInfo } from 'react-icons/fa' 
+import toast from 'react-hot-toast'
+import { FaInfo } from 'react-icons/fa'
 import { constractABI, contractAddress } from '../utils/constant'
 
 declare global {
@@ -13,34 +13,34 @@ declare global {
 const { ethereum } = window
 
 type FormDataType = {
-  addressTo: string;
-  amount: string;
-  keyword: string;
-  message: string;
+    addressTo: string;
+    amount: string;
+    keyword: string;
+    message: string;
 };
 
 type TransactionContextType = {
-  CurrentAccount: string;
-  sendTransaction: () => void;
-  connectWallet: () => Promise<void>;
-  disconnectWallet: () => void;
-  isLoading: boolean;
-  FormData: FormDataType;
-  checkifWalletIsConnected: () => void;
-  transactions: Array<any>;
-  handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
-  balance: string;
-  refreshBalance: () => Promise<void>;
-  refreshTransactions: () => Promise<void>;
-  chainId: number | null;
+    CurrentAccount: string;
+    sendTransaction: () => void;
+    connectWallet: () => Promise<void>;
+    disconnectWallet: () => void;
+    isLoading: boolean;
+    FormData: FormDataType;
+    checkifWalletIsConnected: () => void;
+    transactions: Array<any>;
+    handlechange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
+    balance: string;
+    refreshBalance: () => Promise<void>;
+    refreshTransactions: () => Promise<void>;
+    chainId: number | null;
 };
 
 
-export const TransactionContext = React.createContext<TransactionContextType>({} as TransactionContextType );
+export const TransactionContext = React.createContext<TransactionContextType>({} as TransactionContextType);
 
 
 const getEthereumContract = () => {
-    const provider = new ethers.providers.Web3Provider(ethereum);           
+    const provider = new ethers.providers.Web3Provider(ethereum);
     const signer = provider.getSigner();
     const TransactionContract = new ethers.Contract(contractAddress, constractABI, signer)
     return TransactionContract
@@ -56,7 +56,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     const [isLoading, setisLoading] = useState(false)
     const [transactions, setTransactions] = useState([]);
     const [chainId, setChainId] = useState<number | null>(null);
-    const prevBalanceRef = useRef<string | null>(null)  
+    const prevBalanceRef = useRef<string | null>(null)
 
     const isValidAddress = (address: string): boolean => {
         return ethers.utils.isAddress(address);
@@ -69,8 +69,8 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     const checkifWalletIsConnected = async () => {
         try {
             if (!ethereum) {
-              toast.error("Please Install MetaMask to continue!");
-              return;
+                toast.error("Please Install MetaMask to continue!");
+                return;
             }
             const account = await ethereum?.request({ method: "eth_accounts" });
             if (account.length > 0) {
@@ -84,7 +84,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         }
         catch (error: any) {
             console.error(error);
-            toast.error(error?.message || "Failed to check wallet connection");
+            toast.error("Failed to check wallet connection");
         }
     }
     const getBalance = async () => {
@@ -105,24 +105,24 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             if (prevBalanceRef.current !== null && formattedBalance !== prevBalanceRef.current) {
                 toast.success("Balance updated: " + formattedBalance.substring(0, 6) + " ETH", { id: "balance-update" });
                 getAllTransactions()
-              }
-        
-              prevBalanceRef.current = formattedBalance;
-              if (formattedBalance !== balance) { 
+            }
+
+            prevBalanceRef.current = formattedBalance;
+            if (formattedBalance !== balance) {
                 setBalance(formattedBalance);
-              }
+            }
             return formattedBalance;
-       
+
         } catch (error: any) {
             console.error("Failed to get balance:", error);
-            toast.error(error?.message || "Failed to fetch balance");
+            toast.error("Failed to fetch balance");
             return "";
         }
     };
 
     const refreshBalance = async () => {
         await getBalance();
-        
+
     };
     const getChainId = async () => {
         try {
@@ -160,7 +160,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             if (error.code === 4001) {
                 toast.error("Please connect to MetaMask.");
             } else {
-                toast.error(error?.message || "Failed to connect wallet");
+                toast.error("Failed to connect wallet");
             }
         }
     }
@@ -172,51 +172,66 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         setFormData({ addressTo: "", amount: "", keyword: "", message: "" });
         setChainId(null);
         setTransactions([]);
+        const clearWalletLink = (storage: Storage) => {
+            const keys = Object.keys(storage);
+            keys.forEach((key) => {
+                if (key.startsWith("-walletlink")) {
+                    storage.removeItem(key);
+                }
+            });
+        };
+    
+        clearWalletLink(localStorage);
+        clearWalletLink(sessionStorage);
+        localStorage.removeItem("theme");
+        localStorage.removeItem("token");
+        localStorage.removeItem("transactionCount");
         toast.success("Wallet disconnected successfully");
+        window.location.reload();
     }
 
-     const getAllTransactions = async () => {
-    try {
-      if (ethereum) {
-        const transactionsContract = getEthereumContract();
+    const getAllTransactions = async () => {
+        try {
+            if (ethereum) {
+                const transactionsContract = getEthereumContract();
 
-        const availableTransactions = await transactionsContract.getAllTransactions();
+                const availableTransactions = await transactionsContract.getAllTransactions();
 
-        const structuredTransactions = availableTransactions.map((transaction: any) => ({
-          addressTo: transaction.receiver,
-          addressFrom: transaction.sender,
-          timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
-          message: transaction.message,
-          keyword: transaction.keyword,
-          amount: parseInt(transaction.amount._hex) / (10 ** 18)
-        }));
+                const structuredTransactions = availableTransactions.map((transaction: any) => ({
+                    addressTo: transaction.receiver,
+                    addressFrom: transaction.sender,
+                    timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
+                    message: transaction.message,
+                    keyword: transaction.keyword,
+                    amount: parseInt(transaction.amount._hex) / (10 ** 18)
+                }));
 
-        setTransactions(structuredTransactions);
-      } else {
-        console.log("Ethereum is not present");
-      }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.message || "Failed to fetch transactions");
-    }
-  };
+                setTransactions(structuredTransactions);
+            } else {
+                console.log("Ethereum is not present");
+            }
+        } catch (error: any) {
+            console.log(error);
+            toast.error("Failed to fetch transactions");
+        }
+    };
 
-  const refreshTransactions = async () => {
-    await getAllTransactions();
-  };
+    const refreshTransactions = async () => {
+        await getAllTransactions();
+    };
 
     const setupAccountListener = () => {
         if (ethereum) {
             ethereum.on('accountsChanged', async (accounts: string[]) => {
                 if (accounts.length > 0) {
                     const newAccount = accounts[0];
-                   
+
                     setTransactions([]);
-                   
+
                     setCurrentAccount(newAccount);
-                  
+
                     await getBalance();
-                  
+
                     setTimeout(async () => {
                         await getAllTransactions();
                     }, 100);
@@ -244,14 +259,14 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             }
 
             const { addressTo, amount, keyword, message } = FormData;
-            
-        
+
+
             if (!addressTo || !amount || !keyword || !message) {
-               toast.error("Please fill in all required fields!");
-               return;
+                toast.error("Please fill in all required fields!");
+                return;
             }
 
-        
+
             if (!isValidAddress(addressTo)) {
                 toast.error("Invalid Ethereum address!");
                 return;
@@ -263,7 +278,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
                 return;
             }
 
-         
+
             const currentBalance = parseFloat(balance || "0");
             if (currentBalance < amountNum) {
                 toast.error(`Insufficient balance! You have ${parseFloat(balance).toFixed(4)} ETH`);
@@ -272,9 +287,9 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
             const hexAmount = ethers.utils.parseEther(amount);
             const TransactionContract = getEthereumContract();
-            
+
             toast.loading("Processing transaction...", { id: "tx-loading" });
-            
+
             const tx = await TransactionContract.addToBlockchain(
                 addressTo,
                 message,
@@ -285,24 +300,24 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
             setisLoading(true);
             toast.loading(`Transaction pending... ${shortHash(tx.hash)}`, { id: "tx-loading" });
-            
+
             await tx.wait();
             setisLoading(false);
             toast.success(`Transaction successful! ${shortHash(tx.hash)}`, { id: "tx-loading", duration: 5000 });
-            
-         
+
+
             await getBalance();
             await getAllTransactions();
-            
+
             setFormData({ addressTo: "", amount: "", keyword: "", message: "" });
             const transactionCount = await TransactionContract.getTransactionCount();
             settransactionCount(transactionCount.toNumber());
         } catch (error: any) {
             console.error(error);
             setisLoading(false);
-            toast.error(error?.message || "Transaction failed. Please try again.", { id: "tx-loading" });
-            
-            
+            toast.error("Transaction failed. Please try again.", { id: "tx-loading" });
+
+
             if (error.code === 4001) {
                 toast.error("Transaction rejected by user");
             } else if (error.code === -32603) {
@@ -316,11 +331,11 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         getAllTransactions();
         setupAccountListener();
 
-    
+
         return () => {
             if (ethereum) {
-                ethereum.removeListener('chainChanged', () => {});
-                ethereum.removeListener('accountsChanged', () => {});
+                ethereum.removeListener('chainChanged', () => { });
+                ethereum.removeListener('accountsChanged', () => { });
             }
         };
     }, []);
@@ -328,10 +343,10 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         if (CurrentAccount) {
             getBalance();
-            
+
             getAllTransactions();
         } else {
-           
+
             setTransactions([]);
         }
     }, [CurrentAccount]);
@@ -339,28 +354,28 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (CurrentAccount) {
-          interval = setInterval(() => {
-            refreshBalance();  
-          }, 5000); 
+            interval = setInterval(() => {
+                refreshBalance();
+            }, 5000);
         }
         return () => clearInterval(interval as NodeJS.Timeout);
-      }, [CurrentAccount]);
-      
-   const value = { 
+    }, [CurrentAccount]);
+
+    const value = {
         connectWallet,
-        disconnectWallet, 
-        checkifWalletIsConnected, 
-        isLoading, 
-        transactions, 
-        CurrentAccount, 
-        FormData, 
-        handlechange, 
+        disconnectWallet,
+        checkifWalletIsConnected,
+        isLoading,
+        transactions,
+        CurrentAccount,
+        FormData,
+        handlechange,
         sendTransaction,
         balance,
         refreshBalance,
         refreshTransactions,
         chainId
-    }        
+    }
     return (
         <TransactionContext.Provider value={value}>
             {children}
